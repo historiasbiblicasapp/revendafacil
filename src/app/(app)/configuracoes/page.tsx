@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
-import { LogOut, Save, User } from 'lucide-react'
+import { LogOut, Save, User, Share2, ExternalLink } from 'lucide-react'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 import type { Profile } from '@/types'
@@ -96,6 +96,19 @@ export default function ConfiguracoesPage() {
                   <p className="text-xs text-muted-foreground">
                     Catálogo: /catalogo/{form.slug}
                   </p>
+                )}
+                {form.slug && (
+                  <div className="flex gap-2 mt-2">
+                    <Button type="button" variant="outline" size="sm" onClick={() => window.open(`/catalogo/${form.slug}`, '_blank')}>
+                      <ExternalLink className="h-3 w-3 mr-1" /> Visualizar
+                    </Button>
+                    <Button type="button" variant="outline" size="sm" className="text-green-600 border-green-300 hover:bg-green-50" onClick={() => {
+                      const url = `${window.location.origin}/catalogo/${form.slug}`
+                      window.open(`https://wa.me/?text=${encodeURIComponent(`Olá! Confira meu catálogo de produtos:\n${url}`)}`, '_blank')
+                    }}>
+                      <Share2 className="h-3 w-3 mr-1" /> Compartilhar no WhatsApp
+                    </Button>
+                  </div>
                 )}
               </div>
               <div className="space-y-2">
