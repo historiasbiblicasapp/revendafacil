@@ -14,7 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Plus, Search, Pencil, Trash2, Package } from 'lucide-react'
+import { Plus, Search, Pencil, Trash2, Package, Share2 } from 'lucide-react'
 import { toast } from 'sonner'
 import type { Produto, Marca } from '@/types'
 
@@ -112,6 +112,11 @@ export default function ProdutosPage() {
       quantidade_estoque: String(produto.quantidade_estoque),
     })
     setOpen(true)
+  }
+
+  function shareWhatsApp(prod: Produto & { marcas: { nome: string } | null }) {
+    const texto = `*${prod.nome}*\n💰 R$ ${Number(prod.valor_venda).toFixed(2).replace('.', ',')}${prod.marcas?.nome ? `\n📦 ${prod.marcas.nome}` : ''}${prod.codigo ? ` | Cód: ${prod.codigo}` : ''}${prod.descricao ? `\n\n${prod.descricao}` : ''}`
+    window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank')
   }
 
   return (
@@ -247,7 +252,10 @@ export default function ProdutosPage() {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="ghost" size="icon" onClick={() => openEdit(prod)}>
+                      <Button variant="ghost" size="icon" className="text-green-600" onClick={() => shareWhatsApp(prod)} title="Compartilhar no WhatsApp">
+                          <Share2 className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={() => openEdit(prod)}>
                         <Pencil className="h-4 w-4" />
                       </Button>
                       <Button variant="ghost" size="icon" className="text-red-500" onClick={() => deleteMutation.mutate(prod.id)}>
