@@ -164,7 +164,7 @@ export default function ContasReceberPage() {
 
       <Card>
         <CardContent className="p-0">
-          <Table>
+          <div className="overflow-x-auto"><Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Cliente</TableHead>
@@ -210,7 +210,7 @@ export default function ContasReceberPage() {
                 ))
               )}
             </TableBody>
-          </Table>
+          </Table></div>
         </CardContent>
       </Card>
     </div>

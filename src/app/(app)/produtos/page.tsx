@@ -155,7 +155,7 @@ export default function ProdutosPage() {
                 <Label>Descrição</Label>
                 <Input value={form.descricao} onChange={e => setForm(p => ({ ...p, descricao: e.target.value }))} />
               </div>
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <Label>Valor Compra</Label>
                   <Input type="number" step="0.01" value={form.valor_compra} onChange={e => setForm(p => ({ ...p, valor_compra: e.target.value }))} />
@@ -203,7 +203,7 @@ export default function ProdutosPage() {
 
       <Card>
         <CardContent className="p-0">
-          <Table>
+          <div className="overflow-x-auto"><Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Produto</TableHead>
@@ -258,7 +258,7 @@ export default function ProdutosPage() {
                 ))
               )}
             </TableBody>
-          </Table>
+          </Table></div>
         </CardContent>
       </Card>
     </div>

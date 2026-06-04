@@ -194,7 +194,7 @@ export default function VendasPage() {
               </div>
 
               {itens.length > 0 && (
-                <Table>
+                <div className="overflow-x-auto"><Table>
                   <TableHeader>
                     <TableRow>
                       <TableHead>Produto</TableHead>
@@ -219,7 +219,7 @@ export default function VendasPage() {
                       </TableRow>
                     ))}
                   </TableBody>
-                </Table>
+                </Table></div>
               )}
 
               <div className="flex justify-between items-center pt-2 border-t">
@@ -237,7 +237,7 @@ export default function VendasPage() {
 
       <Card>
         <CardContent className="p-0">
-          <Table>
+          <div className="overflow-x-auto"><Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Data</TableHead>
@@ -272,7 +272,7 @@ export default function VendasPage() {
                 ))
               )}
             </TableBody>
-          </Table>
+          </Table></div>
         </CardContent>
       </Card>
     </div>

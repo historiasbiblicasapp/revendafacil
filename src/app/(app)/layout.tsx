@@ -6,7 +6,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen">
       <Sidebar />
-      <main className="flex-1 ml-64 p-6 bg-muted/30">
+      <main className="flex-1 lg:ml-64 p-4 pt-16 lg:pt-6 bg-muted/30">
         {children}
       </main>
     </div>

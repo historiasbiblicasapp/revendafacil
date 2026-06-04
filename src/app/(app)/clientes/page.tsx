@@ -156,7 +156,7 @@ export default function ClientesPage() {
 
       <Card>
         <CardContent className="p-0">
-          <Table>
+          <div className="overflow-x-auto"><Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Nome</TableHead>
@@ -198,7 +198,7 @@ export default function ClientesPage() {
                 ))
               )}
             </TableBody>
-          </Table>
+          </Table></div>
         </CardContent>
       </Card>
     </div>

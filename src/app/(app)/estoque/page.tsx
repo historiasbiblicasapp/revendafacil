@@ -204,7 +204,7 @@ export default function EstoquePage() {
           <CardTitle>Últimas Movimentações</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          <Table>
+          <div className="overflow-x-auto"><Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Data</TableHead>
@@ -232,7 +232,7 @@ export default function EstoquePage() {
                 <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-8">Nenhuma movimentação</TableCell></TableRow>
               )}
             </TableBody>
-          </Table>
+          </Table></div>
         </CardContent>
       </Card>
     </div>

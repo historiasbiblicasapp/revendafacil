@@ -127,7 +127,7 @@ export default function DespesasPage() {
 
       <Card>
         <CardContent className="p-0">
-          <Table>
+          <div className="overflow-x-auto"><Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Data</TableHead>
@@ -162,7 +162,7 @@ export default function DespesasPage() {
                 ))
               )}
             </TableBody>
-          </Table>
+          </Table></div>
         </CardContent>
       </Card>
     </div>
