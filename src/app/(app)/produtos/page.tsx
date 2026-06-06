@@ -26,7 +26,7 @@ export default function ProdutosPage() {
   const [open, setOpen] = useState(false)
   const [editing, setEditing] = useState<Produto | null>(null)
   const [form, setForm] = useState({
-    nome: '', codigo: '', marca_id: '', descricao: '',
+    nome: '', codigo: '', marca_id: 'sem-marca', descricao: '',
     valor_compra: '', valor_venda: '', quantidade_estoque: '',
   })
 
@@ -60,7 +60,7 @@ export default function ProdutosPage() {
       const payload = {
         nome: form.nome,
         codigo: form.codigo,
-        marca_id: form.marca_id || null,
+        marca_id: form.marca_id === 'sem-marca' ? null : form.marca_id,
         descricao: form.descricao,
         valor_compra: Number(form.valor_compra) || 0,
         valor_venda: Number(form.valor_venda) || 0,
@@ -105,7 +105,7 @@ export default function ProdutosPage() {
     setForm({
       nome: produto.nome,
       codigo: produto.codigo || '',
-      marca_id: produto.marca_id || '',
+      marca_id: produto.marca_id || 'sem-marca',
       descricao: produto.descricao || '',
       valor_compra: String(produto.valor_compra),
       valor_venda: String(produto.valor_venda),
@@ -151,7 +151,7 @@ export default function ProdutosPage() {
                     <SelectValue placeholder="Selecione uma marca" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Sem marca</SelectItem>
+                    <SelectItem value="sem-marca">Sem marca</SelectItem>
                     {marcas?.map(m => <SelectItem key={m.id} value={m.id}>{m.nome}</SelectItem>)}
                   </SelectContent>
                 </Select>
