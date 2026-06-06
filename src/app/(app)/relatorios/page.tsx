@@ -117,7 +117,7 @@ export default function RelatoriosPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-7xl mx-auto">
       <h1 className="text-3xl font-bold">Relatórios</h1>
 
       <Card>

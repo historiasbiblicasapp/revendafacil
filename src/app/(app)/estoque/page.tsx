@@ -91,7 +91,7 @@ export default function EstoquePage() {
   const estoqueZerado = produtos?.filter(p => p.quantidade_estoque <= 0) || []
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-7xl mx-auto">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Estoque</h1>
         <Button onClick={() => setOpen(true)}>

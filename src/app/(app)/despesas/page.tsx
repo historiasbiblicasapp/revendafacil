@@ -80,7 +80,7 @@ export default function DespesasPage() {
   ).reduce((acc, d) => acc + Number(d.valor), 0) || 0
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-7xl mx-auto">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Despesas</h1>
         <div className="flex items-center gap-4">
@@ -101,7 +101,7 @@ export default function DespesasPage() {
               <Label>Descrição</Label>
               <Input value={form.descricao} onChange={e => setForm(p => ({ ...p, descricao: e.target.value }))} required />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Categoria</Label>
                 <Select value={form.categoria} onValueChange={v => setForm(p => ({ ...p, categoria: v }))}>

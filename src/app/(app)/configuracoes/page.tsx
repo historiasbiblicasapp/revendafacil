@@ -72,7 +72,7 @@ export default function ConfiguracoesPage() {
   if (isLoading) return <div className="space-y-6"><Skeleton className="h-96 rounded-xl" /></div>
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-7xl mx-auto">
       <h1 className="text-3xl font-bold">Configurações</h1>
 
       <Card>
@@ -128,7 +128,7 @@ export default function ConfiguracoesPage() {
                 <Input value={form.cidade} onChange={e => setForm(p => ({ ...p, cidade: e.target.value }))} />
               </div>
             </div>
-            <Button type="submit" disabled={mutation.isPending}>
+            <Button type="submit" className="w-full" disabled={mutation.isPending}>
               <Save className="h-4 w-4 mr-2" /> Salvar
             </Button>
           </form>
@@ -142,7 +142,7 @@ export default function ConfiguracoesPage() {
           <CardTitle className="text-red-600">Sair da Conta</CardTitle>
         </CardHeader>
         <CardContent>
-          <Button variant="destructive" onClick={handleLogout}>
+          <Button variant="destructive" className="w-full" onClick={handleLogout}>
             <LogOut className="h-4 w-4 mr-2" /> Sair
           </Button>
         </CardContent>

@@ -97,7 +97,7 @@ export default function ClientesPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-7xl mx-auto">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Clientes</h1>
         <Dialog open={open} onOpenChange={setOpen}>
@@ -115,7 +115,7 @@ export default function ClientesPage() {
                 <Label>Nome</Label>
                 <Input value={form.nome} onChange={e => setForm(p => ({ ...p, nome: e.target.value }))} required />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Telefone</Label>
                   <Input value={form.telefone} onChange={e => setForm(p => ({ ...p, telefone: e.target.value }))} />
@@ -125,7 +125,7 @@ export default function ClientesPage() {
                   <Input value={form.whatsapp} onChange={e => setForm(p => ({ ...p, whatsapp: e.target.value }))} />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Endereço</Label>
                   <Input value={form.endereco} onChange={e => setForm(p => ({ ...p, endereco: e.target.value }))} />
