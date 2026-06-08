@@ -106,7 +106,7 @@ export default function FinanceiroPage() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Financeiro</h1>
+        <h1 className="text-2xl md:text-3xl font-bold">Financeiro</h1>
         <Select value={periodo} onValueChange={setPeriodo}>
           <SelectTrigger className="w-36">
             <SelectValue />

@@ -108,7 +108,7 @@ export default function ContasReceberPage() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Contas a Receber</h1>
+        <h1 className="text-2xl md:text-3xl font-bold">Contas a Receber</h1>
         <Button onClick={() => setOpen(true)}>
           <Plus className="h-4 w-4 mr-2" /> Nova Conta
         </Button>
