@@ -128,7 +128,7 @@ export default function ConfiguracoesPage() {
                 <Input value={form.cidade} onChange={e => setForm(p => ({ ...p, cidade: e.target.value }))} />
               </div>
             </div>
-            <Button type="submit" className="w-full" disabled={mutation.isPending}>
+            <Button type="submit" className="w-full md:w-auto" disabled={mutation.isPending}>
               <Save className="h-4 w-4 mr-2" /> Salvar
             </Button>
           </form>
@@ -142,7 +142,7 @@ export default function ConfiguracoesPage() {
           <CardTitle className="text-red-600">Sair da Conta</CardTitle>
         </CardHeader>
         <CardContent>
-          <Button variant="destructive" className="w-full" onClick={handleLogout}>
+          <Button variant="destructive" className="w-full md:w-auto" onClick={handleLogout}>
             <LogOut className="h-4 w-4 mr-2" /> Sair
           </Button>
         </CardContent>
