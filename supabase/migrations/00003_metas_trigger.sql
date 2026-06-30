@@ -3,7 +3,9 @@
 -- ============================================================
 
 create or replace function atualizar_meta_com_venda()
-returns trigger as $$
+returns trigger
+security definer
+as $$
 begin
   update metas
   set valor_atual = valor_atual + new.valor_total,
@@ -13,8 +15,8 @@ begin
       end
   where user_id = new.user_id
     and status = 'ativa'
-    and new.created_at >= data_inicio
-    and new.created_at <= (data_fim + interval '1 day');
+    and new.created_at::date >= data_inicio
+    and new.created_at::date <= data_fim;
   return new;
 end;
 $$ language plpgsql;
@@ -31,15 +33,17 @@ create trigger trigger_atualizar_meta
 -- ============================================================
 
 create or replace function reverter_meta_venda()
-returns trigger as $$
+returns trigger
+security definer
+as $$
 begin
   update metas
   set valor_atual = greatest(0, valor_atual - old.valor_total),
       status = 'ativa'
   where user_id = old.user_id
     and status = 'atingida'
-    and old.created_at >= data_inicio
-    and old.created_at <= (data_fim + interval '1 day');
+    and old.created_at::date >= data_inicio
+    and old.created_at::date <= data_fim;
   return new;
 end;
 $$ language plpgsql;

@@ -124,10 +124,30 @@ export default function VendasPage() {
           status: 'pendente',
         })
       }
+
+      const hoje = new Date().toISOString().split('T')[0]
+      const { data: metasAtivas, error: errMetas } = await supabase
+        .from('metas')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('status', 'ativa')
+        .lte('data_inicio', hoje)
+        .gte('data_fim', hoje)
+
+      if (!errMetas && metasAtivas && metasAtivas.length > 0) {
+        for (const meta of metasAtivas) {
+          const novoValor = Number(meta.valor_atual) + totalVenda
+          const novoStatus = novoValor >= Number(meta.valor_meta) ? 'atingida' : 'ativa'
+          await supabase.from('metas').update({
+            valor_atual: novoValor,
+            status: novoStatus,
+          }).eq('id', meta.id)
+        }
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['vendas'] })
-      toast.success('Venda registrada!')
+      toast.success('Venda registrada e adicionada à meta!')
       setOpen(false)
       setItens([])
       setClienteId('')
