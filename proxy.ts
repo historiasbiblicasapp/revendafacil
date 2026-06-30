@@ -4,10 +4,12 @@ import { createServerClient } from '@supabase/ssr'
 const protectedRoutes = [
   '/dashboard', '/clientes', '/marcas', '/produtos', '/estoque',
   '/vendas', '/contas-receber', '/despesas', '/financeiro',
-  '/relatorios', '/metas', '/configuracoes',
+  '/relatorios', '/metas', '/configuracoes', '/admin',
 ]
 
 const authRoutes = ['/login', '/cadastro', '/recuperar-senha']
+
+const adminEmail = 'admin@revendafacil.com'
 
 export default async function proxy(req: NextRequest) {
   const path = req.nextUrl.pathname
@@ -35,6 +37,18 @@ export default async function proxy(req: NextRequest) {
 
   if (isAuth && user) {
     return NextResponse.redirect(new URL('/dashboard', req.nextUrl))
+  }
+
+  if (isProtected && user && user.email !== adminEmail) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('data_expiracao')
+      .eq('id', user.id)
+      .single()
+
+    if (profile?.data_expiracao && new Date(profile.data_expiracao) < new Date()) {
+      return NextResponse.redirect(new URL('/assinatura-expirada', req.nextUrl))
+    }
   }
 
   return NextResponse.next()

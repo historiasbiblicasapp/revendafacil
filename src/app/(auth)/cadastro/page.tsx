@@ -22,7 +22,7 @@ export default function CadastroPage() {
     e.preventDefault()
     setLoading(true)
     const supabase = createClient()
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -35,7 +35,18 @@ export default function CadastroPage() {
       setLoading(false)
       return
     }
-    toast.success('Conta criada! Verifique seu email para confirmar.')
+    if (data.user) {
+      const exp = new Date()
+      exp.setDate(exp.getDate() + 7)
+      await supabase.from('profiles').upsert({
+        id: data.user.id,
+        nome,
+        email,
+        data_expiracao: exp.toISOString(),
+        plano: 'gratuito',
+      })
+    }
+    toast.success('Conta criada! Você tem 7 dias grátis. Verifique seu email para confirmar.')
     router.push('/login')
   }
 

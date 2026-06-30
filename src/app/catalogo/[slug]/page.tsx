@@ -1,10 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { ShoppingCart, Percent, MessageCircle, Store } from 'lucide-react'
-import type { Produto, Marca, Profile } from '@/types'
+import CatalogoClient from '@/components/catalogo-client'
 
 export default async function CatalogoPage(props: { params: Promise<{ slug: string }> }) {
   const { slug } = await props.params
@@ -31,146 +27,51 @@ export default async function CatalogoPage(props: { params: Promise<{ slug: stri
     .eq('user_id', profile.id)
     .order('nome')
 
-  const produtosAgrupados = marcas?.map(marca => ({
-    marca,
-    produtos: produtos?.filter(p => p.marca_id === marca.id) || [],
-  })) || []
-
-  const produtosSemMarca = produtos?.filter(p => !p.marca_id) || []
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
-      <header className="bg-white border-b sticky top-0 z-10">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
-              <Percent className="h-6 w-6 text-primary-foreground" />
-            </div>
-            <div>
-              <h1 className="font-bold text-xl">{profile.nome || 'Revenda'}</h1>
-              {profile.cidade && (
-                <p className="text-xs text-muted-foreground">{profile.cidade}</p>
-              )}
-            </div>
+    <div className="min-h-screen" style={{ background: 'linear-gradient(135deg, #f5f3ff 0%, #ede9fe 50%, #e0e7ff 100%)' }}>
+      <header className="relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #7c3aed, #6366f1, #3b82f6)' }}>
+        <div className="absolute inset-0" style={{
+          background: 'radial-gradient(circle, rgba(255,255,255,.08) 0%, transparent 60%)',
+          animation: 'float 8s ease-in-out infinite',
+        }} />
+        <style>{`@keyframes float { 0%,100%{transform:translate(0,0)} 50%{transform:translate(30px,-30px)} }`}</style>
+        <div className="max-w-6xl mx-auto px-4 py-8 sm:py-12 relative z-10 text-center sm:text-left sm:flex sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-white drop-shadow-md">
+              🛍️ {profile.nome || 'Catálogo'}
+            </h1>
+            {profile.cidade && (
+              <p className="text-white/80 mt-1 text-sm sm:text-base">{profile.cidade}</p>
+            )}
+            <span className="inline-block mt-3 bg-white/20 backdrop-blur-sm text-white text-xs font-semibold px-3 py-1 rounded-full border border-white/30">
+              📸 Catálogo Digital
+            </span>
           </div>
           {profile.whatsapp && (
             <a
               href={`https://wa.me/55${profile.whatsapp.replace(/\D/g, '')}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-green-600 transition-colors"
+              className="mt-4 sm:mt-0 inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white px-5 py-2.5 rounded-full text-sm font-semibold transition-all border border-white/30"
             >
-              <MessageCircle className="h-4 w-4" />
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 0C5.373 0 0 5.373 0 12c0 2.137.56 4.146 1.537 5.896L0 24l6.337-1.523A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.6c-1.823 0-3.583-.496-5.093-1.425l-.365-.214-3.84.924.932-3.619-.237-.374A9.54 9.54 0 012.4 12c0-5.301 4.299-9.6 9.6-9.6s9.6 4.299 9.6 9.6-4.299 9.6-9.6 9.6z"/>
+                <path d="M17.287 13.775c-.25-.125-1.474-.725-1.7-.807-.228-.083-.393-.125-.56.125-.165.25-.645.807-.79.973-.146.165-.292.185-.54.06-.25-.125-1.052-.387-2.002-1.237-.74-.663-1.24-1.48-1.385-1.73-.145-.25-.015-.385.11-.51.11-.11.25-.293.375-.44.125-.147.166-.25.25-.415.083-.165.042-.31-.02-.435-.062-.125-.56-1.35-.767-1.85-.202-.488-.406-.422-.56-.43-.145-.008-.31-.008-.476-.008s-.435.062-.663.31c-.228.25-.87.85-.87 2.073 0 1.225.89 2.406 1.015 2.573.125.166 1.75 2.675 4.242 3.753.592.256 1.054.41 1.414.525.594.19 1.134.164 1.562.1.476-.072 1.474-.602 1.682-1.185.208-.583.208-1.082.146-1.186-.06-.104-.22-.166-.47-.29z"/>
+              </svg>
               Fale Conosco
             </a>
           )}
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-4 py-8">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold mb-2">Catálogo de Produtos</h2>
-          <p className="text-muted-foreground">Confira nossos produtos e faça seu pedido pelo WhatsApp</p>
-        </div>
+      <CatalogoClient
+        produtos={produtos || []}
+        marcas={marcas || []}
+        profile={{ id: profile.id, nome: profile.nome, whatsapp: profile.whatsapp, cidade: profile.cidade }}
+      />
 
-        {produtosAgrupados.map(({ marca, produtos: prods }) => prods.length > 0 && (
-          <section key={marca.id} className="mb-12">
-            <div className="flex items-center gap-3 mb-6">
-              <Store className="h-6 w-6 text-primary" />
-              <h3 className="text-2xl font-semibold">{marca.nome}</h3>
-              <Badge variant="secondary">{prods.length} produtos</Badge>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {prods.map(prod => (
-                <Card key={prod.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                  <div className="aspect-square bg-gradient-to-br from-purple-100 to-blue-100 flex items-center justify-center p-8">
-                    {prod.foto_url ? (
-                      <img src={prod.foto_url} alt={prod.nome} className="w-full h-full object-contain" />
-                    ) : (
-                      <div className="text-4xl font-bold text-primary/30">{prod.nome.charAt(0)}</div>
-                    )}
-                  </div>
-                  <CardContent className="p-4">
-                    <h4 className="font-semibold mb-1">{prod.nome}</h4>
-                    {prod.descricao && (
-                      <p className="text-xs text-muted-foreground mb-2 line-clamp-2">{prod.descricao}</p>
-                    )}
-                    <div className="flex items-center justify-between mt-3">
-                      <div>
-                        <p className="text-lg font-bold text-primary">
-                          R$ {Number(prod.valor_venda).toFixed(2).replace('.', ',')}
-                        </p>
-                        {prod.valor_compra > 0 && (
-                          <p className="text-xs text-muted-foreground line-through">
-                            R$ {Number(prod.valor_compra).toFixed(2).replace('.', ',')}
-                          </p>
-                        )}
-                      </div>
-                      {prod.quantidade_estoque <= 5 && (
-                        <Badge variant="warning">{prod.quantidade_estoque} und.</Badge>
-                      )}
-                    </div>
-                    {profile.whatsapp && (
-                      <a
-                        href={`https://wa.me/55${profile.whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(`Olá! Tenho interesse no produto: ${prod.nome} - R$ ${Number(prod.valor_venda).toFixed(2).replace('.', ',')}`)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mt-3 w-full inline-flex items-center justify-center gap-2 bg-green-500 text-white text-sm py-2 rounded-lg hover:bg-green-600 transition-colors"
-                      >
-                        <ShoppingCart className="h-4 w-4" />
-                        Comprar pelo WhatsApp
-                      </a>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </section>
-        ))}
-
-        {produtosSemMarca.length > 0 && (
-          <section className="mb-12">
-            <h3 className="text-2xl font-semibold mb-6">Outros Produtos</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {produtosSemMarca.map(prod => (
-                <Card key={prod.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                  <div className="aspect-square bg-gradient-to-br from-purple-100 to-blue-100 flex items-center justify-center p-8">
-                    <div className="text-4xl font-bold text-primary/30">{prod.nome.charAt(0)}</div>
-                  </div>
-                  <CardContent className="p-4">
-                    <h4 className="font-semibold mb-1">{prod.nome}</h4>
-                    <p className="text-lg font-bold text-primary">
-                      R$ {Number(prod.valor_venda).toFixed(2).replace('.', ',')}
-                    </p>
-                    {profile.whatsapp && (
-                      <a
-                        href={`https://wa.me/55${profile.whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(`Olá! Tenho interesse no produto: ${prod.nome} - R$ ${Number(prod.valor_venda).toFixed(2).replace('.', ',')}`)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mt-3 w-full inline-flex items-center justify-center gap-2 bg-green-500 text-white text-sm py-2 rounded-lg hover:bg-green-600 transition-colors"
-                      >
-                        <ShoppingCart className="h-4 w-4" />
-                        Comprar pelo WhatsApp
-                      </a>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {(!produtos || produtos.length === 0) && (
-          <div className="text-center py-20">
-            <Store className="h-16 w-16 mx-auto text-muted-foreground/30 mb-4" />
-            <h3 className="text-xl font-medium text-muted-foreground">Nenhum produto disponível</h3>
-            <p className="text-muted-foreground/60">Volte em breve para conferir nossas novidades</p>
-          </div>
-        )}
-      </main>
-
-      <footer className="border-t bg-white py-6 text-center text-sm text-muted-foreground">
-        <p>&copy; {new Date().getFullYear()} Revenda Fácil - {profile.nome || 'Catálogo'}</p>
+      <footer className="border-t bg-white/80 py-6 text-center text-xs sm:text-sm text-gray-400">
+        <p>&copy; {new Date().getFullYear()} Revenda Fácil — {profile.nome || 'Catálogo Digital'}</p>
       </footer>
     </div>
   )

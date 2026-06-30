@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
-import { LogOut, Save, User, Share2, ExternalLink } from 'lucide-react'
+import { LogOut, Save, User, Share2, ExternalLink, Clock, Shield } from 'lucide-react'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 import type { Profile } from '@/types'
@@ -132,6 +132,47 @@ export default function ConfiguracoesPage() {
               <Save className="h-4 w-4 mr-2" /> Salvar
             </Button>
           </form>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Shield className="h-5 w-5 text-purple-600" /> Plano
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {profile && (
+            <>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Plano atual</span>
+                <span className={`font-medium px-2 py-0.5 rounded-full text-xs ${
+                  (profile as any).plano === 'premium' ? 'bg-green-100 text-green-700' :
+                  (profile as any).plano === 'bloqueado' ? 'bg-red-100 text-red-700' :
+                  'bg-purple-100 text-purple-700'
+                }`}>
+                  {(profile as any).plano || 'gratuito'}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Expira em</span>
+                <span className="flex items-center gap-1 font-medium">
+                  <Clock className="h-4 w-4 text-orange-500" />
+                  {(profile as any).data_expiracao
+                    ? new Date((profile as any).data_expiracao).toLocaleDateString('pt-BR')
+                    : '—'}
+                </span>
+              </div>
+              {profile.email === 'admin@revendafacil.com' && (
+                <a
+                  href="/admin/assinaturas"
+                  className="inline-flex items-center gap-2 text-sm text-purple-600 hover:text-purple-800 font-medium mt-2"
+                >
+                  <Shield className="h-4 w-4" /> Gerenciar assinaturas
+                </a>
+              )}
+            </>
+          )}
         </CardContent>
       </Card>
 

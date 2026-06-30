@@ -9,6 +9,8 @@ export interface Profile {
   logo_url: string | null
   cor_principal: string | null
   slug: string | null
+  data_expiracao: string | null
+  plano: string | null
   created_at: string
   updated_at: string
 }

@@ -4,10 +4,11 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
+import { createClient } from '@/lib/supabase/client'
 import {
   LayoutDashboard, Users, Tags, Package, Warehouse, ShoppingCart,
   Receipt, Wallet, BarChart3, Target, Settings, Menu, X,
-  FileText, Percent,
+  FileText, Percent, Shield,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
@@ -30,8 +31,17 @@ const menuItems = [
 export function Sidebar() {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
 
-  useEffect(() => { setOpen(false) }, [pathname])
+  useEffect(() => {
+    setOpen(false)
+    const checkAdmin = async () => {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      setIsAdmin(user?.email === 'admin@revendafacil.com')
+    }
+    checkAdmin()
+  }, [pathname])
 
   return (
     <>
@@ -67,6 +77,20 @@ export function Sidebar() {
         </div>
         <Separator />
         <nav className="flex-1 overflow-y-auto p-2 space-y-1">
+          {isAdmin && (
+            <Link
+              href="/admin/assinaturas"
+              className={cn(
+                "flex items-center gap-3 px-3 py-3 min-h-[44px] rounded-lg text-sm font-medium transition-colors",
+                pathname.startsWith('/admin')
+                  ? "bg-primary/10 text-primary"
+                  : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+              )}
+            >
+              <Shield className="h-5 w-5 shrink-0" />
+              <span>Assinaturas</span>
+            </Link>
+          )}
           {menuItems.map((item) => {
             const Icon = item.icon
             const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
