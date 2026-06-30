@@ -96,7 +96,7 @@ export default function FinanceiroPage() {
 
   const cards = [
     { title: 'Entradas', value: data?.entradas || 0, icon: TrendingUp, color: 'text-green-600', bg: 'bg-green-100' },
-    { title: 'Saídas', value: data?.saidas || 0, icon: TrendingDown, color: 'text-red-600', bg: 'bg-red-100' },
+    { title: 'Saídas', value: -(data?.saidas || 0), icon: TrendingDown, color: 'text-red-600', bg: 'bg-red-100' },
     { title: 'Lucro Bruto', value: data?.lucroBruto || 0, icon: DollarSign, color: 'text-emerald-600', bg: 'bg-emerald-100' },
     { title: 'Lucro Líquido', value: data?.lucroLiquido ?? 0, icon: PiggyBank, color: 'text-purple-600', bg: 'bg-purple-100' },
     { title: 'Saldo Atual', value: data?.saldoAtual ?? 0, icon: Wallet, color: 'text-blue-600', bg: 'bg-blue-100' },

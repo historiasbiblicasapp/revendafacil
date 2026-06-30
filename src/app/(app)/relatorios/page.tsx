@@ -187,7 +187,7 @@ export default function RelatoriosPage() {
                   <div className="flex justify-between p-3 bg-red-50 rounded-lg">
                     <span>Despesas</span>
                     <span className="font-bold text-red-600">
-                      R$ {despesas.toFixed(2).replace('.', ',')}
+                      R$ {(-despesas).toFixed(2).replace('.', ',')}
                     </span>
                   </div>
                   <div className="flex justify-between p-3 bg-purple-50 rounded-lg">
