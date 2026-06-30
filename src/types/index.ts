@@ -32,6 +32,7 @@ export interface Marca {
   id: string
   user_id: string
   nome: string
+  comissao_percentual: number
   logo_url: string | null
   created_at: string
   updated_at: string

@@ -48,8 +48,8 @@ export default function ProdutosPage() {
     queryFn: async () => {
       const user = (await supabase.auth.getUser()).data.user
       if (!user) return []
-      const { data } = await supabase.from('marcas').select('id, nome').eq('user_id', user.id)
-      return (data || []) as Pick<Marca, 'id' | 'nome'>[]
+      const { data } = await supabase.from('marcas').select('id, nome, comissao_percentual').eq('user_id', user.id)
+      return (data || []) as (Marca & { comissao_percentual: number })[]
     },
   })
 
@@ -174,14 +174,22 @@ export default function ProdutosPage() {
                   <Input type="number" value={form.quantidade_estoque} onChange={e => setForm(p => ({ ...p, quantidade_estoque: e.target.value }))} />
                 </div>
               </div>
-              {form.valor_compra && form.valor_venda && (
-                <div className="text-sm">
-                  <span className="text-muted-foreground">Lucro Unitário: </span>
-                  <span className="font-medium text-emerald-600">
-                    R$ {(Number(form.valor_venda) - Number(form.valor_compra)).toFixed(2).replace('.', ',')}
-                  </span>
-                </div>
-              )}
+              {form.valor_venda && (() => {
+                const marcaSel = marcas?.find(m => m.id === form.marca_id)
+                const com = marcaSel?.comissao_percentual || 0
+                const lucro = com > 0
+                  ? Number(form.valor_venda) * (com / 100)
+                  : Number(form.valor_venda) - (Number(form.valor_compra) || 0)
+                if (form.valor_venda) return (
+                  <div className="text-sm">
+                    <span className="text-muted-foreground">Lucro Unitário: </span>
+                    <span className="font-medium text-emerald-600">
+                      R$ {lucro.toFixed(2).replace('.', ',')}
+                    </span>
+                    {com > 0 && <span className="text-xs text-muted-foreground ml-2">({com}% comissão)</span>}
+                  </div>
+                )
+              })()}
               <Button type="submit" className="w-full" disabled={mutation.isPending}>
                 {editing ? 'Atualizar' : 'Cadastrar'}
               </Button>

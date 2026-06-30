@@ -166,28 +166,39 @@ export default function RelatoriosPage() {
             <CardTitle>Financeiro</CardTitle>
           </CardHeader>
           <CardContent>
-            {data?.rows && (
-              <div className="space-y-2">
-                <div className="flex justify-between p-3 bg-green-50 rounded-lg">
-                  <span>Total de Vendas</span>
-                  <span className="font-bold text-green-600">
-                    R$ {(data.rows as any).vendas?.reduce((a: number, v: any) => a + Number(v.valor_total), 0).toFixed(2).replace('.', ',')}
-                  </span>
+            {data?.rows && (() => {
+              const totalVendas = (data.rows as any).vendas?.reduce((a: number, v: any) => a + Number(v.valor_total), 0) || 0
+              const lucroBruto = (data.rows as any).vendas?.reduce((a: number, v: any) => a + Number(v.lucro_total), 0) || 0
+              const despesas = (data.rows as any).despesas?.reduce((a: number, d: any) => a + Number(d.valor), 0) || 0
+              return (
+                <div className="space-y-2">
+                  <div className="flex justify-between p-3 bg-blue-50 rounded-lg">
+                    <span>Total de Vendas</span>
+                    <span className="font-bold text-blue-600">
+                      R$ {totalVendas.toFixed(2).replace('.', ',')}
+                    </span>
+                  </div>
+                  <div className="flex justify-between p-3 bg-emerald-50 rounded-lg">
+                    <span>Lucro Bruto (Vendas - Custo)</span>
+                    <span className="font-bold text-emerald-600">
+                      R$ {lucroBruto.toFixed(2).replace('.', ',')}
+                    </span>
+                  </div>
+                  <div className="flex justify-between p-3 bg-red-50 rounded-lg">
+                    <span>Despesas</span>
+                    <span className="font-bold text-red-600">
+                      R$ {despesas.toFixed(2).replace('.', ',')}
+                    </span>
+                  </div>
+                  <div className="flex justify-between p-3 bg-purple-50 rounded-lg">
+                    <span>Lucro Líquido (Bruto - Despesas)</span>
+                    <span className="font-bold text-purple-600">
+                      R$ {(lucroBruto - despesas).toFixed(2).replace('.', ',')}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex justify-between p-3 bg-red-50 rounded-lg">
-                  <span>Total de Despesas</span>
-                  <span className="font-bold text-red-600">
-                    R$ {(data.rows as any).despesas?.reduce((a: number, d: any) => a + Number(d.valor), 0).toFixed(2).replace('.', ',')}
-                  </span>
-                </div>
-                <div className="flex justify-between p-3 bg-purple-50 rounded-lg">
-                  <span>Lucro Líquido</span>
-                  <span className="font-bold text-purple-600">
-                    R$ {((data.rows as any).vendas?.reduce((a: number, v: any) => a + Number(v.valor_total), 0) - (data.rows as any).despesas?.reduce((a: number, d: any) => a + Number(d.valor), 0)).toFixed(2).replace('.', ',')}
-                  </span>
-                </div>
-              </div>
-            )}
+              )
+            })()}
           </CardContent>
         </Card>
       ) : (

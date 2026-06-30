@@ -21,6 +21,7 @@ export default function MarcasPage() {
   const [open, setOpen] = useState(false)
   const [editing, setEditing] = useState<Marca | null>(null)
   const [nome, setNome] = useState('')
+  const [comissao, setComissao] = useState('')
 
   const { data: marcas, isLoading } = useQuery({
     queryKey: ['marcas'],
@@ -36,11 +37,12 @@ export default function MarcasPage() {
     mutationFn: async () => {
       const user = (await supabase.auth.getUser()).data.user
       if (!user) throw new Error('Not authenticated')
+      const payload = { nome, comissao_percentual: Number(comissao) || 0 }
       if (editing) {
-        const { error } = await supabase.from('marcas').update({ nome }).eq('id', editing.id)
+        const { error } = await supabase.from('marcas').update(payload).eq('id', editing.id)
         if (error) throw error
       } else {
-        const { error } = await supabase.from('marcas').insert({ nome, user_id: user.id })
+        const { error } = await supabase.from('marcas').insert({ ...payload, user_id: user.id })
         if (error) throw error
       }
     },
@@ -50,6 +52,7 @@ export default function MarcasPage() {
       setOpen(false)
       setEditing(null)
       setNome('')
+      setComissao('')
     },
     onError: (err) => toast.error(err.message),
   })
@@ -74,7 +77,7 @@ export default function MarcasPage() {
         <h1 className="text-2xl md:text-3xl font-bold">Marcas</h1>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button onClick={() => { setEditing(null); setNome('') }}>
+            <Button onClick={() => { setEditing(null); setNome(''); setComissao('') }}>
               <Plus className="h-4 w-4 mr-2" /> Nova Marca
             </Button>
           </DialogTrigger>
@@ -87,6 +90,11 @@ export default function MarcasPage() {
                 <Label>Nome da Marca</Label>
                 <Input value={nome} onChange={e => setNome(e.target.value)} required />
               </div>
+              <div className="space-y-2">
+                <Label>Comissão (%)</Label>
+                <Input type="number" step="0.01" min="0" max="100" value={comissao} onChange={e => setComissao(e.target.value)} placeholder="Ex: 30" />
+                <p className="text-xs text-muted-foreground">Percentual de comissão que você ganha ao vender produtos desta marca</p>
+              </div>
               <Button type="submit" className="w-full" disabled={mutation.isPending}>
                 {editing ? 'Atualizar' : 'Cadastrar'}
               </Button>
@@ -97,7 +105,7 @@ export default function MarcasPage() {
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {marcasPadrao.filter(m => !marcas?.some(mr => mr.nome === m)).map(marca => (
-          <Card key={marca} className="cursor-pointer hover:border-primary/50 transition-colors" onClick={() => { setNome(marca); setEditing(null); setOpen(true) }}>
+          <Card key={marca} className="cursor-pointer hover:border-primary/50 transition-colors" onClick={() => { setNome(marca); setComissao(''); setEditing(null); setOpen(true) }}>
             <CardContent className="p-6 flex items-center gap-3">
               <Tag className="h-5 w-5 text-muted-foreground" />
               <span className="font-medium">{marca}</span>
@@ -120,10 +128,15 @@ export default function MarcasPage() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <Tag className="h-5 w-5 text-primary" />
-                      <span className="font-medium">{marca.nome}</span>
+                      <div>
+                        <span className="font-medium">{marca.nome}</span>
+                        {marca.comissao_percentual > 0 && (
+                          <p className="text-xs text-emerald-600 font-medium">{marca.comissao_percentual}% de comissão</p>
+                        )}
+                      </div>
                     </div>
                     <div className="flex gap-1">
-                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => { setEditing(marca); setNome(marca.nome); setOpen(true) }}>
+                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => { setEditing(marca); setNome(marca.nome); setComissao(String(marca.comissao_percentual || '')); setOpen(true) }}>
                         <Pencil className="h-3 w-3" />
                       </Button>
                       <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500" onClick={() => deleteMutation.mutate(marca.id)}>
