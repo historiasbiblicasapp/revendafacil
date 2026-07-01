@@ -45,6 +45,11 @@ export default function CadastroPage() {
         data_expiracao: exp.toISOString(),
         plano: 'gratuito',
       })
+      fetch('/api/notify-cadastro', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ record: { nome, email } }),
+      }).catch(() => {})
     }
     toast.success('Conta criada! Você tem 7 dias grátis. Verifique seu email para confirmar.')
     router.push('/login')

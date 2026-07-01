@@ -163,6 +163,11 @@ export default function CatalogoClient({ produtos, marcas, profile }: {
     return { grupos: g, semMarca: produtos.filter(p => !p.marca_id) }
   }, [produtos, marcas])
 
+  const relacionados = useMemo(() => {
+    const pool = produtos.filter(p => p.marca_id)
+    return pool.sort(() => Math.random() - 0.5).slice(0, 8)
+  }, [produtos])
+
   const filtrados = useMemo(() => {
     let ativos = grupos
     if (filtro !== 'todos') {
@@ -270,6 +275,21 @@ export default function CatalogoClient({ produtos, marcas, profile }: {
                       {filtrados.semMarca.map((prod, i) => (
                         <Product3DCard key={prod.id} prod={prod} whatsapp={profile.whatsapp} idx={i} />
                       ))}
+                    </div>
+                  </section>
+                )}
+
+                {relacionados.length > 0 && filtro === 'todos' && !busca && (
+                  <section className="mb-8 sm:mb-12">
+                    <div className="flex items-center gap-2.5 mb-4 sm:mb-5">
+                      <span className="text-xl sm:text-2xl">🔄</span>
+                      <h2 className="text-lg sm:text-2xl font-black text-gray-800">Quem viu, viu também</h2>
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5 sm:gap-5">
+                      {relacionados.map((prod, i) => {
+                        const m = marcas.find(m => m.id === prod.marca_id)
+                        return <Product3DCard key={prod.id} prod={prod} whatsapp={profile.whatsapp} marcaNome={m?.nome} idx={i} />
+                      })}
                     </div>
                   </section>
                 )}
