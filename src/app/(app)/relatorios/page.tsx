@@ -172,27 +172,27 @@ export default function RelatoriosPage() {
               const despesas = (data.rows as any).despesas?.reduce((a: number, d: any) => a + Number(d.valor), 0) || 0
               return (
                 <div className="space-y-2">
-                  <div className="flex justify-between p-3 bg-blue-50 rounded-lg">
+                  <div className="flex justify-between p-3 bg-violet-50 rounded-lg">
                     <span>Total de Vendas</span>
-                    <span className="font-bold text-blue-600">
+                    <span className="font-bold text-violet-600">
                       R$ {totalVendas.toFixed(2).replace('.', ',')}
                     </span>
                   </div>
-                  <div className="flex justify-between p-3 bg-emerald-50 rounded-lg">
+                  <div className="flex justify-between p-3 bg-purple-50 rounded-lg">
                     <span>Lucro Bruto (Vendas - Custo)</span>
-                    <span className="font-bold text-emerald-600">
+                    <span className="font-bold text-purple-600">
                       R$ {lucroBruto.toFixed(2).replace('.', ',')}
                     </span>
                   </div>
-                  <div className="flex justify-between p-3 bg-red-50 rounded-lg">
+                  <div className="flex justify-between p-3 bg-rose-50 rounded-lg">
                     <span>Despesas</span>
-                    <span className="font-bold text-red-600">
+                    <span className="font-bold text-rose-600">
                       R$ {(-despesas).toFixed(2).replace('.', ',')}
                     </span>
                   </div>
-                  <div className="flex justify-between p-3 bg-purple-50 rounded-lg">
+                  <div className="flex justify-between p-3 bg-fuchsia-50 rounded-lg">
                     <span>Lucro Líquido (Bruto - Despesas)</span>
-                    <span className="font-bold text-purple-600">
+                    <span className="font-bold text-fuchsia-600">
                       R$ {(lucroBruto - despesas).toFixed(2).replace('.', ',')}
                     </span>
                   </div>

@@ -144,14 +144,14 @@ export default function DashboardPage() {
   }
 
   const cards = [
-    { title: 'Total Vendido (Mês)', value: stats?.totalVendido || 0, icon: DollarSign, color: 'text-green-600', bg: 'bg-green-100' },
-    { title: 'Total Recebido', value: stats?.totalRecebido || 0, icon: TrendingUp, color: 'text-blue-600', bg: 'bg-blue-100' },
-    { title: 'Total Pendente', value: stats?.totalPendente || 0, icon: Receipt, color: 'text-yellow-600', bg: 'bg-yellow-100' },
-    { title: 'Lucro Bruto', value: stats?.lucroTotal || 0, icon: TrendingUp, color: 'text-emerald-600', bg: 'bg-emerald-100' },
-    { title: 'Lucro Líquido', value: (stats?.lucroLiquido ?? 0), icon: Percent, color: 'text-purple-600', bg: 'bg-purple-100' },
-    { title: 'Despesas (Mês)', value: stats?.totalDespesas || 0, icon: TrendingDown, color: 'text-red-600', bg: 'bg-red-100' },
-    { title: 'Clientes', value: stats?.qtdClientes || 0, icon: Users, color: 'text-indigo-600', bg: 'bg-indigo-100' },
-    { title: 'Produtos', value: stats?.qtdProdutos || 0, icon: Package, color: 'text-orange-600', bg: 'bg-orange-100' },
+    { title: 'Total Vendido (Mês)', value: stats?.totalVendido || 0, icon: DollarSign, color: 'text-violet-600', bg: 'bg-violet-100' },
+    { title: 'Total Recebido', value: stats?.totalRecebido || 0, icon: TrendingUp, color: 'text-indigo-600', bg: 'bg-indigo-100' },
+    { title: 'Total Pendente', value: stats?.totalPendente || 0, icon: Receipt, color: 'text-amber-600', bg: 'bg-amber-100' },
+    { title: 'Lucro Bruto', value: stats?.lucroTotal || 0, icon: TrendingUp, color: 'text-purple-600', bg: 'bg-purple-100' },
+    { title: 'Lucro Líquido', value: (stats?.lucroLiquido ?? 0), icon: Percent, color: 'text-fuchsia-600', bg: 'bg-fuchsia-100' },
+    { title: 'Despesas (Mês)', value: stats?.totalDespesas || 0, icon: TrendingDown, color: 'text-rose-600', bg: 'bg-rose-100' },
+    { title: 'Clientes', value: stats?.qtdClientes || 0, icon: Users, color: 'text-purple-600', bg: 'bg-purple-100' },
+    { title: 'Produtos', value: stats?.qtdProdutos || 0, icon: Package, color: 'text-fuchsia-600', bg: 'bg-fuchsia-100' },
   ]
 
   return (
