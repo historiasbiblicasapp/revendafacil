@@ -12,14 +12,17 @@ import { toast } from 'sonner'
 import jsPDF from 'jspdf'
 import 'jspdf-autotable'
 import * as XLSX from 'xlsx'
+import type { Venda, Despesa } from '@/types'
 
 export default function RelatoriosPage() {
   const supabase = createClient()
   const [tipoRelatorio, setTipoRelatorio] = useState('clientes')
-  const [mes, setMes] = useState(new Date().toISOString().substring(0, 7))
+  const hoje = new Date().toISOString().split('T')[0]
+  const [dataInicial, setDataInicial] = useState(hoje.substring(0, 7) + '-01')
+  const [dataFinal, setDataFinal] = useState(hoje)
 
   const { data, isLoading } = useQuery({
-    queryKey: ['relatorio', tipoRelatorio, mes],
+    queryKey: ['relatorio', tipoRelatorio, dataInicial, dataFinal],
     queryFn: async () => {
       const user = (await supabase.auth.getUser()).data.user
       if (!user) return null
@@ -42,18 +45,35 @@ export default function RelatoriosPage() {
           .select('*, clientes(nome)')
           .eq('user_id', user.id)
           .eq('status', 'concluida')
-          .gte('created_at', `${mes}-01`)
-          .lt('created_at', new Date(new Date(mes).getFullYear(), new Date(mes).getMonth() + 1, 1).toISOString().split('T')[0])
+          .gte('created_at', dataInicial + 'T00:00:00')
+          .lte('created_at', dataFinal + 'T23:59:59')
           .order('created_at', { ascending: false })
         return { rows: data || [], columns: ['Data', 'Cliente', 'Valor', 'Lucro', 'Pagamento'] }
       }
       if (tipoRelatorio === 'financeiro') {
-        const { data: vendas } = await supabase.from('vendas').select('*').eq('user_id', user.id).eq('status', 'concluida')
-        const { data: despesas } = await supabase.from('despesas').select('*').eq('user_id', user.id)
-        return { rows: { vendas, despesas }, columns: ['Indicador', 'Valor'] }
+        const { data: vendas } = await supabase
+          .from('vendas')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('status', 'concluida')
+          .gte('created_at', dataInicial + 'T00:00:00')
+          .lte('created_at', dataFinal + 'T23:59:59')
+        const { data: despesas } = await supabase
+          .from('despesas')
+          .select('*')
+          .eq('user_id', user.id)
+          .gte('data', dataInicial)
+          .lte('data', dataFinal)
+        return { rows: { vendas, despesas } as any, columns: ['Indicador', 'Valor'] }
       }
       if (tipoRelatorio === 'contas') {
-        const { data } = await supabase.from('contas_receber').select('*, clientes(nome)').eq('user_id', user.id).order('data_vencimento')
+        const { data } = await supabase
+          .from('contas_receber')
+          .select('*, clientes(nome)')
+          .eq('user_id', user.id)
+          .gte('data_vencimento', dataInicial)
+          .lte('data_vencimento', dataFinal)
+          .order('data_vencimento')
         return { rows: data || [], columns: ['Cliente', 'Valor', 'Vencimento', 'Status'] }
       }
       return null
@@ -70,21 +90,47 @@ export default function RelatoriosPage() {
     return []
   }
 
+  function financeiroRows() {
+    const d = data?.rows as any
+    if (!d?.vendas && !d?.despesas) return []
+    const totalVendas = d.vendas?.reduce((a: number, v: any) => a + Number(v.valor_total), 0) || 0
+    const lucroBruto = d.vendas?.reduce((a: number, v: any) => a + Number(v.lucro_total), 0) || 0
+    const despesas = d.despesas?.reduce((a: number, d: any) => a + Number(d.valor), 0) || 0
+    return [
+      ['Total de Vendas', `R$ ${totalVendas.toFixed(2)}`],
+      ['Lucro Bruto', `R$ ${lucroBruto.toFixed(2)}`],
+      ['Despesas', `R$ ${despesas.toFixed(2)}`],
+      ['Lucro Líquido', `R$ ${(lucroBruto - despesas).toFixed(2)}`],
+    ]
+  }
+
   function gerarPDF() {
-    if (!data?.rows || (Array.isArray(data.rows) && data.rows.length === 0)) {
-      toast.error('Nenhum dado para gerar relatório')
-      return
-    }
+    if (!data?.rows) { toast.error('Nenhum dado para gerar relatório'); return }
+    if (Array.isArray(data.rows) && data.rows.length === 0) { toast.error('Nenhum dado para gerar relatório'); return }
+
     const doc = new jsPDF()
     doc.setFontSize(18)
     doc.text('Revenda Fácil', 14, 22)
     doc.setFontSize(12)
     doc.text(`Relatório de ${tipoRelatorio.charAt(0).toUpperCase() + tipoRelatorio.slice(1)}`, 14, 32)
 
-    if (!Array.isArray(data.rows)) {
-      toast.error('Tipo de relatório não suportado para PDF')
+    if (tipoRelatorio === 'financeiro') {
+      const rows = financeiroRows()
+      if (rows.length > 0) {
+        ;(doc as any).autoTable({
+          head: [['Indicador', 'Valor']],
+          body: rows,
+          startY: 40,
+          styles: { fontSize: 8 },
+          headStyles: { fillColor: [124, 58, 237] },
+        })
+      }
+      doc.save(`relatorio-${tipoRelatorio}-${dataInicial}-${dataFinal}.pdf`)
+      toast.success('PDF gerado!')
       return
     }
+
+    if (!Array.isArray(data.rows)) { toast.error('Tipo de relatório não suportado para PDF'); return }
     const rows = formatData(data.rows, tipoRelatorio)
     if (rows.length > 0) {
       ;(doc as any).autoTable({
@@ -95,24 +141,31 @@ export default function RelatoriosPage() {
         headStyles: { fillColor: [124, 58, 237] },
       })
     }
-    doc.save(`relatorio-${tipoRelatorio}-${mes}.pdf`)
+    doc.save(`relatorio-${tipoRelatorio}-${dataInicial}-${dataFinal}.pdf`)
     toast.success('PDF gerado!')
   }
 
   function gerarExcel() {
-    if (!data?.rows || (Array.isArray(data.rows) && data.rows.length === 0)) {
-      toast.error('Nenhum dado para gerar relatório')
+    if (!data?.rows) { toast.error('Nenhum dado para gerar relatório'); return }
+    if (Array.isArray(data.rows) && data.rows.length === 0) { toast.error('Nenhum dado para gerar relatório'); return }
+
+    if (tipoRelatorio === 'financeiro') {
+      const rows = financeiroRows()
+      if (rows.length === 0) { toast.error('Nenhum dado para gerar relatório'); return }
+      const ws = XLSX.utils.aoa_to_sheet([['Indicador', 'Valor'], ...rows])
+      const wb = XLSX.utils.book_new()
+      XLSX.utils.book_append_sheet(wb, ws, 'Relatório')
+      XLSX.writeFile(wb, `relatorio-${tipoRelatorio}-${dataInicial}-${dataFinal}.xlsx`)
+      toast.success('Excel gerado!')
       return
     }
-    if (!Array.isArray(data.rows)) {
-      toast.error('Tipo de relatório não suportado para Excel')
-      return
-    }
+
+    if (!Array.isArray(data.rows)) { toast.error('Tipo de relatório não suportado para Excel'); return }
     const rows = formatData(data.rows, tipoRelatorio)
     const ws = XLSX.utils.aoa_to_sheet([data.columns, ...rows])
     const wb = XLSX.utils.book_new()
     XLSX.utils.book_append_sheet(wb, ws, 'Relatório')
-    XLSX.writeFile(wb, `relatorio-${tipoRelatorio}-${mes}.xlsx`)
+    XLSX.writeFile(wb, `relatorio-${tipoRelatorio}-${dataInicial}-${dataFinal}.xlsx`)
     toast.success('Excel gerado!')
   }
 
@@ -125,7 +178,7 @@ export default function RelatoriosPage() {
           <CardTitle>Gerar Relatório</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">Tipo de Relatório</label>
               <Select value={tipoRelatorio} onValueChange={setTipoRelatorio}>
@@ -143,8 +196,12 @@ export default function RelatoriosPage() {
               </Select>
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Período (para vendas)</label>
-              <input type="month" className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm" value={mes} onChange={e => setMes(e.target.value)} />
+              <label className="text-sm font-medium">Data Inicial</label>
+              <input type="date" className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm" value={dataInicial} onChange={e => setDataInicial(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Data Final</label>
+              <input type="date" className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm" value={dataFinal} onChange={e => setDataFinal(e.target.value)} />
             </div>
             <div className="flex items-end gap-2">
               <Button onClick={gerarPDF} className="flex-1">
@@ -167,9 +224,10 @@ export default function RelatoriosPage() {
           </CardHeader>
           <CardContent>
             {data?.rows && (() => {
-              const totalVendas = (data.rows as any).vendas?.reduce((a: number, v: any) => a + Number(v.valor_total), 0) || 0
-              const lucroBruto = (data.rows as any).vendas?.reduce((a: number, v: any) => a + Number(v.lucro_total), 0) || 0
-              const despesas = (data.rows as any).despesas?.reduce((a: number, d: any) => a + Number(d.valor), 0) || 0
+              const d = data.rows as any
+              const totalVendas = d.vendas?.reduce((a: number, v: any) => a + Number(v.valor_total), 0) || 0
+              const lucroBruto = d.vendas?.reduce((a: number, v: any) => a + Number(v.lucro_total), 0) || 0
+              const despesas = d.despesas?.reduce((a: number, dv: any) => a + Number(dv.valor), 0) || 0
               return (
                 <div className="space-y-2">
                   <div className="flex justify-between p-3 bg-violet-50 rounded-lg">
