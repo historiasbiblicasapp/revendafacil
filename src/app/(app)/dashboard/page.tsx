@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   DollarSign, TrendingUp, TrendingDown, Users, Package,
-  ShoppingCart, Receipt, Percent, LogOut,
+  ShoppingCart, Receipt, Percent, LogOut, AlertTriangle,
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import {
@@ -25,6 +25,20 @@ export default function DashboardPage() {
     await supabase.auth.signOut()
     router.push('/login')
   }
+
+  const { data: plano } = useQuery({
+    queryKey: ['meu-plano'],
+    queryFn: async () => {
+      const user = (await supabase.auth.getUser()).data.user
+      if (!user) return null
+      const { data } = await supabase.from('profiles').select('plano, data_expiracao').eq('id', user.id).single()
+      return data as { plano: string | null; data_expiracao: string | null }
+    },
+  })
+
+  const diasRestantes = plano?.data_expiracao
+    ? Math.ceil((new Date(plano.data_expiracao).getTime() - Date.now()) / 86400000)
+    : 0
 
   const { data: stats, isLoading } = useQuery({
     queryKey: ['dashboard-stats'],
@@ -162,6 +176,26 @@ export default function DashboardPage() {
           <LogOut className="h-4 w-4 mr-2" /> Sair
         </Button>
       </div>
+
+      {diasRestantes > 0 && diasRestantes <= 7 && (
+        <div className="flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-xl text-sm">
+          <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5 shrink-0" />
+          <div>
+            <p className="font-medium text-amber-800">Sua assinatura vence em {diasRestantes} {diasRestantes === 1 ? 'dia' : 'dias'}</p>
+            <p className="text-amber-700 mt-1">Entre em contato com o admin para renovar.</p>
+          </div>
+        </div>
+      )}
+
+      {plano?.data_expiracao && diasRestantes <= 0 && (
+        <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-xl text-sm">
+          <AlertTriangle className="h-5 w-5 text-red-600 mt-0.5 shrink-0" />
+          <div>
+            <p className="font-medium text-red-800">Assinatura vencida</p>
+            <p className="text-red-700 mt-1">Seu acesso está limitado. Renove para continuar usando.</p>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {cards.map((card) => {
